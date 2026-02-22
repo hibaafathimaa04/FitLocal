@@ -2,27 +2,37 @@
   <img src="./img.png" alt="Project Banner" width="100%">
 </p>
 
-# [Project Name] 🎯
+# [FitLocal] 🎯
 
 ## Basic Details
 
-### Team Name: [Name]
+### Team Name: [Techie Mogu]
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
+- Member 1: [Hiba Fathima K.N] - [Toc H institute of sceince and technology]
+- Member 2: [Diya S.S] - [Toc H institute of sceince and technology]
 
 ### Hosted Project Link
-[[mention your project hosted link here]](https://fit-local-affp.vercel.app/)
+[[Project link]](https://fit-local-affp.vercel.app/)
 
 ### Project Description
-[2-3 lines about what your project does]
+[FitLocal is a women-focused local thrift website that helps users find pre-loved clothes that actually fit them, near their area, without endless scrolling. It also allows users to buy, sell, swap, or auction items, making sustainable fashion simple and community-friendly.]
 
 ### The Problem statement
-[What problem are you solving?]
+[Women often struggle to find thrift clothes that match their size and location. Existing platforms are global, cluttered, and time-consuming, with no simple way to filter by size or area. There is also no easy system for swapping or auctioning items locally.]
 
 ### The Solution
-[How are you solving it?]
+[FitLocal provides a smart, user-friendly platform with Buy, Sell, Swap, and Auction options. Users can:
+
+Browse clothes that fit their size and area
+
+List their own items for sale or swap
+
+Participate in auctions for pre-loved clothes
+
+Quickly filter by size and area with a smart size match indicator
+
+This approach makes thrift shopping fast, sustainable, and focused on the local community.]
 
 ---
 
@@ -31,25 +41,25 @@
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
-- Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+- Languages used: [HTML, CSS, JavaScript]
+- Frameworks used: [None]
+- Libraries used: [None]
+- Tools used: [VS Code, Git/GitHub, Chrome DevTools, Live Server extension]
 
 **For Hardware:**
-- Main components: [List main components]
-- Specifications: [Technical specifications]
-- Tools required: [List tools needed]
+- Main components: [Laptop/PC.]
+- Specifications: [Any system capable of running VS Code and Chrome browser (Windows/Mac/Linux).]
+- Tools required: [Internet connection (for any online testing), Web browser.]
 
 ---
 
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1: [Smart Size Match Indicator – Shows users whether a clothes item is a perfect fit, might fit, or doesn’t match, based on their profile size.]
+- Feature 2: [Local-Area Filtering – Lets users browse items only in their city or neighborhood, making local thrift shopping fast and relevant.]
+- Feature 3: [Buy, Sell, Swap & Auction Options – Users can buy items, sell their own, request swaps, or participate in auctions, all in one platform.]
+- Feature 4: [Simple & Clean UI – Minimalist design that’s easy to navigate, even for first-time users.]
 
 ---
 
@@ -59,21 +69,21 @@ List the key features of your project:
 
 #### Installation
 ```bash
-[Installation commands - e.g., npm install, pip install -r requirements.txt]
+[used basic html, so no commands]
 ```
 
 #### Run
 ```bash
-[Run commands - e.g., npm start, python app.py]
+[used basic html, so no commands]
 ```
 
 ### For Hardware:
 
 #### Components Required
-[List all components needed with specifications]
+[Laptop/PC]
 
 #### Circuit Setup
-[Explain how to set up the circuit]
+[None]
 
 ---
 
@@ -83,14 +93,17 @@ List the key features of your project:
 
 #### Screenshots (Add at least 3)
 
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot1](<img width="1366" height="720" alt="image" src="https://github.com/user-attachments/assets/72ad02bf-46e1-48ee-8416-ca1348d9747e" />
+)
+This is the login page.
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot2](<img width="1366" height="720" alt="image" src="https://github.com/user-attachments/assets/0e58d882-0593-4e9f-96c1-3c653d8b6572" />
+)
+This is the next interface which shows the home pge, where you can enter you size, location, type of dress. You can either browse or sell items.
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot3](<img width="1366" height="720" alt="image" src="https://github.com/user-attachments/assets/2ea6a8cb-4da9-42d3-8475-9e0bccdd3728" />
+)
+This is the profile page which shows our profile status, number of saved items, sold items etc. It also shows our username and preferred size too.
 
 #### Diagrams
 
@@ -361,7 +374,7 @@ python script.py -v --format json data.json
 ## Project Demo
 
 ### Video
-[Add your demo video link here - YouTube, Google Drive, etc.]
+[https://drive.google.com/file/d/1OT1PsLyh7-lWzZ2HRd5IJL-8yQKZrxlc/view?usp=sharing]
 
 *Explain what the video demonstrates - key features, user flow, technical highlights*
 
