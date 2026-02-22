@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitLocal - Women's Community Thrift Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="center">
+        <div class="card">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <h1 style="margin: 0;">FitLocal</h1>
+                <p class="subtitle">Affordable Fashion for Kerala Women</p>
+            </div>
+
+            <div id="loginForm">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <input type="text" id="username" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Login</button>
+                </form>
+                <p style="margin: 12px 0; font-size: 14px;">Don't have an account? <a href="#" onclick="toggleForm()" style="color: var(--color-rose); font-weight: 600;">Sign Up</a></p>
+            </div>
+
+            <div id="signupForm" class="hidden">
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <input type="text" id="newUsername" placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="newPassword" placeholder="Create password" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Size</label>
+                        <select id="size" required>
+                            <option value="">Select your size</option>
+                            <option>XS</option>
+                            <option>S</option>
+                            <option>M</option>
+                            <option>L</option>
+                            <option>XL</option>
+                            <option>XXL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kerala District</label>
+                        <select id="location" required>
+                            <option value="">Select district</option>
+                            <option>Thiruvananthapuram</option>
+                            <option>Kollam</option>
+                            <option>Pathanamthitta</option>
+                            <option>Alappuzha</option>
+                            <option>Kottayam</option>
+                            <option>Idukki</option>
+                            <option>Ernakulam</option>
+                            <option>Thrissur</option>
+                            <option>Palakkad</option>
+                            <option>Malappuram</option>
+                            <option>Kozhikode</option>
+                            <option>Wayanad</option>
+                            <option>Kannur</option>
+                            <option>Kasaragod</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Create Account</button>
+                </form>
+                <p style="margin: 12px 0; font-size: 14px;">Already have an account? <a href="#" onclick="toggleForm()" style="color: var(--color-rose); font-weight: 600;">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function toggleForm() {
+            document.getElementById('loginForm').classList.toggle('hidden');
+            document.getElementById('signupForm').classList.toggle('hidden');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const stored = localStorage.getItem("user_" + username);
+            if (!stored) {
+                alert("User not found");
+                return;
+            }
+            
+            const user = JSON.parse(stored);
+            if (user.password !== password) {
+                alert("Wrong password");
+                return;
+            }
+            
+            localStorage.setItem("currentUser", username);
+            window.location.href = "home.html";
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const size = document.getElementById('size').value;
+            const location = document.getElementById('location').value;
+            
+            if (password !== confirmPassword) {
+                alert("Passwords don't match");
+                return;
+            }
+            
+            if (localStorage.getItem("user_" + username)) {
+                alert("Username already exists");
+                return;
+            }
+            
+            const user = { username, password, size, location };
+            localStorage.setItem("user_" + username, JSON.stringify(user));
+            alert("Account created successfully! Please login.");
+            toggleForm();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - FitLocal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">FitLocal</a>
+        
+        <div class="navbar-menu">
+            <a href="home.html" class="nav-link" onclick="setActive(this)">Home</a>
+            <a href="search.html" class="nav-link" onclick="setActive(this)">Search</a>
+            <a href="upload.html" class="nav-link" onclick="setActive(this)">Upload</a>
+            <a href="saved.html" class="nav-link" onclick="setActive(this)">Saved</a>
+            <a href="auction.html" class="nav-link" onclick="setActive(this)">Auctions</a>
+            <a href="profile.html" class="nav-link active" onclick="setActive(this)">Profile</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="navbar-icon" title="Search">🔍</div>
+            <div class="navbar-icon" title="Notifications">🔔</div>
+            <button class="btn btn-primary btn-small" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <section class="profile-header">
+        <div class="profile-avatar" id="userAvatar">👤</div>
+        <h2 class="profile-name" id="profileUsername">Loading...</h2>
+        <p class="subtitle" id="profileLocation">-</p>
+    </section>
+
+    <!-- Statistics -->
+    <div class="profile-stats">
+        <div class="stat">
+            <div class="stat-value" id="listedCount">0</div>
+            <div class="stat-label">Items Listed</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="savedCount">0</div>
+            <div class="stat-label">Saved Items</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="soldCount">0</div>
+            <div class="stat-label">Items Sold</div>
+        </div>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="profile-info">
+        <h3 style="font-family: 'Poppins', sans-serif; margin-bottom: 20px; color: var(--color-charcoal);">Account Information</h3>
+        
+        <div class="info-item">
+            <span style="font-weight: 500;">Username</span>
+            <span id="accountUsername">-</span>
+        </div>
+        
+        <div class="info-item">
+            <span style="font-weight: 500;">Preferred Size</span>
+            <span id="accountSize">-</span>
+        </div>
+        
+        <div class="info-item">
+            <span style="font-weight: 500;">District</span>
+            <span id="accountDistrict">-</span>
+        </div>
+        
+        <div class="info-item">
+            <span style="font-weight: 500;">Member Since</span>
+            <span id="memberSince">-</span>
+        </div>
+        
+        <div class="info-item">
+            <span style="font-weight: 500;">Account Status</span>
+            <span style="color: var(--color-success); font-weight: 600;">✓ Active</span>
+        </div>
+    </div>
+
+    <!-- My Listings -->
+    <div style="max-width: 1200px; margin: 60px auto; padding: 0 24px;">
+        <h3 style="font-family: 'Poppins', sans-serif; font-size: 24px; margin-bottom: 24px; color: var(--color-charcoal);">My Listings</h3>
+        <div id="myListings" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin: 0;"></div>
+        <div id="noListings" style="text-align: center; padding: 40px; color: var(--color-text-light);">
+            <p style="margin: 0; font-size: 16px;">No items listed yet.</p>
+            <a href="upload.html" class="btn btn-primary" style="margin-top: 16px;">Upload Your First Item</a>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="max-width: 600px; margin: 40px auto; padding: 0 24px; display: flex; gap: 12px; justify-content: center;">
+        <button class="btn btn-secondary" onclick="window.location.href='upload.html'">Upload Item</button>
+        <button class="btn btn-outline" onclick="window.location.href='home.html'">Back to Home</button>
+    </div>
+
+    <div style="height: 40px;"></div>
+
+    <script src="app.js"></script>
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function loadProfile() {
+            const currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem("user_" + currentUser)) || {};
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            
+            const userItems = items.filter(item => item.seller === currentUser);
+            const soldCount = userItems.filter(item => item.sold).length;
+
+            // Set profile header
+            document.getElementById('profileUsername').textContent = currentUser;
+            document.getElementById('profileLocation').textContent = `📍 ${user.location || 'Location not set'}`;
+            document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+
+            // Set stats
+            document.getElementById('listedCount').textContent = userItems.length;
+            document.getElementById('savedCount').textContent = saved.length;
+            document.getElementById('soldCount').textContent = soldCount;
+
+            // Set account info
+            document.getElementById('accountUsername').textContent = currentUser;
+            document.getElementById('accountSize').textContent = user.size || '-';
+            document.getElementById('accountDistrict').textContent = user.location || '-';
+            document.getElementById('memberSince').textContent = new Date().toLocaleDateString();
+
+            // Set my listings
+            const listingsContainer = document.getElementById('myListings');
+            const noListings = document.getElementById('noListings');
+
+            if (userItems.length === 0) {
+                listingsContainer.innerHTML = '';
+                noListings.style.display = 'block';
+            } else {
+                noListings.style.display = 'none';
+                listingsContainer.innerHTML = userItems.map((item, index) => `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-badges">
+                                <span class="badge badge-district">${item.location}</span>
+                                <span class="badge" style="background: rgba(100, 100, 100, 0.15); color: #666;">${item.type}</span>
+                            </div>
+                            <h3 class="product-name">${item.name}</h3>
+                            <div class="product-meta">Size: ${item.size}</div>
+                            <div class="product-price">₹${item.price}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.onload = loadProfile;
+    </script>
+</body>
+</html>

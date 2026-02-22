@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctions - FitLocal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">FitLocal</a>
+        
+        <div class="navbar-menu">
+            <a href="home.html" class="nav-link" onclick="setActive(this)">Home</a>
+            <a href="search.html" class="nav-link" onclick="setActive(this)">Search</a>
+            <a href="upload.html" class="nav-link" onclick="setActive(this)">Upload</a>
+            <a href="saved.html" class="nav-link" onclick="setActive(this)">Saved</a>
+            <a href="auction.html" class="nav-link active" onclick="setActive(this)">Auctions</a>
+            <a href="profile.html" class="nav-link" onclick="setActive(this)">Profile</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="navbar-icon" title="Search">🔍</div>
+            <div class="navbar-icon" title="Notifications">🔔</div>
+            <div class="navbar-icon" title="Account" onclick="window.location.href='profile.html'">👤</div>
+            <button class="btn btn-primary btn-small" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="hero-section" style="padding: 40px 24px; text-align: center;">
+        <h1 style="font-family: 'Poppins', sans-serif; font-size: 32px; margin-bottom: 8px;">🔥 Live Auctions</h1>
+        <p style="color: var(--color-text-light); margin-bottom: 0;">Bid on exclusive fashion items from sellers across Kerala</p>
+    </section>
+
+    <!-- Auction Items -->
+    <div style="max-width: 1200px; margin: 40px auto; padding: 0 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;" id="auctionItems"></div>
+        <div id="noAuctions" class="hidden" style="text-align: center; padding: 80px 24px;">
+            <div style="font-size: 64px; margin-bottom: 16px;">🏜️</div>
+            <h2 style="font-family: 'Poppins', sans-serif; margin-bottom: 8px;">No active auctions</h2>
+            <p style="color: var(--color-text-light); margin-bottom: 24px;">Check back soon for exciting bid wars!</p>
+            <a href="upload.html" class="btn btn-primary">Start an Auction</a>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div style="text-align: center; padding: 24px; background: var(--color-light-gray);">
+        <div class="filter-section" style="justify-content: center;">
+            <div class="filter-group">
+                <label>Sort By:</label>
+                <select id="sortFilter" onchange="loadAuctions()">
+                    <option value="ending-soon">Ending Soon</option>
+                    <option value="most-bids">Most Bids</option>
+                    <option value="highest-bid">Highest Bid</option>
+                    <option value="newly-listed">Newly Listed</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function formatTimeRemaining(endTime) {
+            const now = Date.now();
+            const timeLeft = endTime - now;
+
+            if (timeLeft <= 0) return "Ended";
+
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+
+        function getUrgencyClass(endTime) {
+            const timeLeft = endTime - Date.now();
+            const hoursLeft = timeLeft / (1000 * 60 * 60);
+            if (hoursLeft < 1) return 'urgent';
+            if (hoursLeft < 24) return 'warning';
+            return '';
+        }
+
+        function loadAuctions() {
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const sortBy = document.getElementById('sortFilter').value;
+            const currentUser = localStorage.getItem("currentUser");
+
+            // Filter only auction items
+            let auctions = items.filter(item => item.type === 'Auction' && !item.sold);
+
+            // Sort
+            if (sortBy === 'ending-soon') {
+                auctions.sort((a, b) => a.endTime - b.endTime);
+            } else if (sortBy === 'most-bids') {
+                auctions.reverse();
+            } else if (sortBy === 'highest-bid') {
+                auctions.sort((a, b) => b.highestBid - a.highestBid);
+            }
+
+            const container = document.getElementById('auctionItems');
+            const noAuctions = document.getElementById('noAuctions');
+
+            if (auctions.length === 0) {
+                container.innerHTML = '';
+                noAuctions.classList.remove('hidden');
+                return;
+            }
+
+            noAuctions.classList.add('hidden');
+            container.innerHTML = auctions.map((item, index) => {
+                const urgency = getUrgencyClass(item.endTime);
+                const timeRemaining = formatTimeRemaining(item.endTime);
+                const userProfile = JSON.parse(localStorage.getItem("user_" + currentUser)) || {};
+                
+                let fitBadge = '';
+                if (userProfile.size === item.size) {
+                    fitBadge = '<span class="badge badge-perfect">Perfect Fit</span>';
+                } else {
+                    fitBadge = '<span class="badge badge-fit">Might Fit</span>';
+                }
+
+                return `
+                    <div class="auction-card">
+                        <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                            <img src="${item.image}" alt="${item.name}" style="width: 120px; height: 120px; border-radius: 8px; object-fit: cover;">
+                            <div style="flex: 1;">
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 18px; margin: 0 0 8px 0; color: var(--color-charcoal);">${item.name}</h3>
+                                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                    ${fitBadge}
+                                    <span class="badge badge-district">${item.location}</span>
+                                </div>
+                                <p style="font-size: 12px; color: var(--color-text-light); margin: 0;">Size: ${item.size} • by ${item.seller}</p>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--color-border); padding-top: 16px;">
+                            <span class="auction-timer ${urgency}">
+                                ⏱️ Ends in: ${timeRemaining}
+                            </span>
+
+                            <div style="margin: 16px 0;">
+                                <p style="font-size: 12px; color: var(--color-text-light); margin: 0 0 4px 0;">Current Bid</p>
+                                <div class="current-bid">₹${item.highestBid}</div>
+                            </div>
+
+                            <div style="margin-bottom: 16px;">
+                                <input 
+                                    type="number" 
+                                    id="bid-${item.id}" 
+                                    placeholder="Enter your bid (min ₹${Number(item.highestBid) + 100})" 
+                                    min="${Number(item.highestBid) + 100}"
+                                    step="50"
+                                    class="bid-input"
+                                >
+                            </div>
+
+                            <button class="bid-action" onclick="placeBid('${item.id}', '${item.seller}')">
+                                🎯 Place Bid Now
+                            </button>
+
+                            <button class="btn btn-secondary btn-small" onclick="addAuctionToSaved(${items.indexOf(item)})" style="width: 100%; margin-top: 8px;">
+                                ❤️ Save to Wishlist
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function placeBid(itemId, seller) {
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const item = items.find(i => i.id == itemId);
+            const bidInput = document.getElementById('bid-' + itemId);
+            const bidAmount = Number(bidInput.value);
+            const currentUser = localStorage.getItem("currentUser");
+
+            if (!bidAmount) {
+                alert("Please enter a bid amount");
+                return;
+            }
+
+            if (bidAmount <= item.highestBid) {
+                alert("Your bid must be higher than the current bid ₹" + item.highestBid);
+                return;
+            }
+
+            if (currentUser === seller) {
+                alert("You cannot bid on your own auction!");
+                return;
+            }
+
+            item.highestBid = bidAmount;
+            item.lastBidder = currentUser;
+            localStorage.setItem("items", JSON.stringify(items));
+
+            alert("Bid placed successfully! 🎉 Current bid: ₹" + bidAmount);
+            loadAuctions();
+        }
+
+        function addToSaved(index) {
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            const item = items[index];
+            
+            const exists = saved.some(s => s.id === item.id);
+            if (!exists) {
+                saved.push(item);
+                localStorage.setItem("saved", JSON.stringify(saved));
+                alert("Added to wishlist! ❤️");
+            }
+        }
+
+        function addAuctionToSaved(index) {
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            const item = items[index];
+            
+            const exists = saved.some(s => s.id === item.id);
+            if (!exists) {
+                saved.push(item);
+                localStorage.setItem("saved", JSON.stringify(saved));
+            }
+            loadAuctions();
+        }
+
+        window.onload = loadAuctions;
+
+        // Update auction display every 10 seconds
+        setInterval(loadAuctions, 10000);
+    </script>
+</body>
+</html>

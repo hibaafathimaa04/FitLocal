@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Item - FitLocal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">FitLocal</a>
+        
+        <div class="navbar-menu">
+            <a href="home.html" class="nav-link" onclick="setActive(this)">Home</a>
+            <a href="search.html" class="nav-link" onclick="setActive(this)">Search</a>
+            <a href="upload.html" class="nav-link active" onclick="setActive(this)">Upload</a>
+            <a href="saved.html" class="nav-link" onclick="setActive(this)">Saved</a>
+            <a href="auction.html" class="nav-link" onclick="setActive(this)">Auctions</a>
+            <a href="profile.html" class="nav-link" onclick="setActive(this)">Profile</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="navbar-icon" title="Search">🔍</div>
+            <div class="navbar-icon" title="Notifications">🔔</div>
+            <div class="navbar-icon" title="Account" onclick="window.location.href='profile.html'">👤</div>
+            <button class="btn btn-primary btn-small" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Upload Form -->
+    <div class="form-container">
+        <h2 style="margin-bottom: 8px;">List Your Item</h2>
+        <p class="subtitle" style="margin-bottom: 32px;">Share your pre-loved fashion with Kerala's fashion lovers</p>
+
+        <form onsubmit="handleAddItem(event)">
+            <!-- Image Upload -->
+            <div class="form-group">
+                <label>Item Image</label>
+                <input type="file" id="itemImage" accept="image/*" onchange="previewImage(event)">
+                <div class="image-preview" id="imagePreview">
+                    <span style="color: var(--color-text-light);">📸 Image preview</span>
+                </div>
+            </div>
+
+            <!-- Item Details -->
+            <div class="form-group">
+                <label>Item Name *</label>
+                <input type="text" id="itemName" placeholder="e.g., Vintage Denim Jacket" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="itemDescription" placeholder="Describe the condition, brand, and style..." rows="4"></textarea>
+            </div>
+
+            <!-- Size Selection -->
+            <div class="form-group">
+                <label>Size *</label>
+                <select id="itemSize" required>
+                    <option value="">Select size</option>
+                    <option>XS</option>
+                    <option>S</option>
+                    <option>M</option>
+                    <option>L</option>
+                    <option>XL</option>
+                    <option>XXL</option>
+                </select>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label>Your District *</label>
+                <select id="itemLocation" required>
+                    <option value="">Select district</option>
+                    <option>Thiruvananthapuram</option>
+                    <option>Kollam</option>
+                    <option>Pathanamthitta</option>
+                    <option>Alappuzha</option>
+                    <option>Kottayam</option>
+                    <option>Idukki</option>
+                    <option>Ernakulam</option>
+                    <option>Thrissur</option>
+                    <option>Palakkad</option>
+                    <option>Malappuram</option>
+                    <option>Kozhikode</option>
+                    <option>Wayanad</option>
+                    <option>Kannur</option>
+                    <option>Kasaragod</option>
+                </select>
+            </div>
+
+            <!-- Listing Type -->
+            <div class="form-group">
+                <label>Listing Type *</label>
+                <select id="itemType" onchange="updatePriceField()" required>
+                    <option value="">Select type</option>
+                    <option value="Sell">Sell (Fixed Price)</option>
+                    <option value="Swap">Swap</option>
+                    <option value="Auction">Auction (Bid Wars)</option>
+                </select>
+            </div>
+
+            <!-- Price/Base Price -->
+            <div class="form-group" id="priceGroup" style="display: none;">
+                <label id="priceLabel">Price (₹) *</label>
+                <input type="number" id="basePrice" placeholder="Enter price" min="100" step="50">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-bottom: 12px;">List Item</button>
+            <a href="home.html" class="btn btn-outline" style="width: 100%; text-align: center; display: block; padding: 12px;">Back to Home</a>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updatePriceField() {
+            const type = document.getElementById('itemType').value;
+            const priceGroup = document.getElementById('priceGroup');
+            const priceLabel = document.getElementById('priceLabel');
+            
+            if (type === 'Sell' || type === 'Auction') {
+                priceGroup.style.display = 'block';
+                priceLabel.textContent = type === 'Auction' ? 'Starting Bid (₹) *' : 'Price (₹) *';
+            } else {
+                priceGroup.style.display = 'none';
+            }
+        }
+
+        function handleAddItem(event) {
+            event.preventDefault();
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const currentUser = localStorage.getItem("currentUser");
+            const imageFile = document.getElementById('itemImage').files[0];
+            const basePrice = document.getElementById('basePrice').value;
+            const itemType = document.getElementById('itemType').value;
+
+            // Validate required fields
+            if (!basePrice && (itemType === 'Sell' || itemType === 'Auction')) {
+                alert("Please enter a price");
+                return;
+            }
+
+            // Handle image upload
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const newItem = {
+                        id: Date.now(),
+                        name: document.getElementById('itemName').value,
+                        description: document.getElementById('itemDescription').value || '',
+                        size: document.getElementById('itemSize').value,
+                        location: document.getElementById('itemLocation').value,
+                        type: itemType,
+                        seller: currentUser,
+                        price: basePrice || 0,
+                        highestBid: basePrice || 0,
+                        endTime: Date.now() + (7 * 24 * 60 * 60 * 1000),
+                        createdAt: new Date().toISOString(),
+                        sold: false,
+                        image: e.target.result
+                    };
+
+                    items.push(newItem);
+                    localStorage.setItem("items", JSON.stringify(items));
+                    alert("Item listed successfully! 🎉");
+                    window.location.href = "home.html";
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                alert("Please upload an image");
+            }
+        }
+    </script>
+</body>
+</html>

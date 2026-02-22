@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - FitLocal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">FitLocal</a>
+        
+        <div class="navbar-menu">
+            <a href="home.html" class="nav-link" onclick="setActive(this)">Home</a>
+            <a href="search.html" class="nav-link active" onclick="setActive(this)">Search</a>
+            <a href="upload.html" class="nav-link" onclick="setActive(this)">Upload</a>
+            <a href="saved.html" class="nav-link" onclick="setActive(this)">Saved</a>
+            <a href="auction.html" class="nav-link" onclick="setActive(this)">Auctions</a>
+            <a href="profile.html" class="nav-link" onclick="setActive(this)">Profile</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="navbar-icon" title="Search">🔍</div>
+            <div class="navbar-icon" title="Notifications">🔔</div>
+            <div class="navbar-icon" title="Account" onclick="window.location.href='profile.html'">👤</div>
+            <button class="btn btn-primary btn-small" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <h1 style="font-family: 'Poppins', sans-serif; font-size: 36px; margin-bottom: 8px;">Find Your Perfect Fit</h1>
+        <p style="color: var(--color-text-light); margin-bottom: 40px; font-size: 16px;">Discover sustainable fashion from sellers across Kerala</p>
+
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Search by item name or brand..." 
+                onkeyup="performSearch()"
+            >
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Size:</label>
+                <select id="filterSize" onchange="performSearch()">
+                    <option value="">All Sizes</option>
+                    <option>XS</option>
+                    <option>S</option>
+                    <option>M</option>
+                    <option>L</option>
+                    <option>XL</option>
+                    <option>XXL</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>District:</label>
+                <select id="filterDistrict" onchange="performSearch()">
+                    <option value="">All Districts</option>
+                    <option>Thiruvananthapuram</option>
+                    <option>Kollam</option>
+                    <option>Pathanamthitta</option>
+                    <option>Alappuzha</option>
+                    <option>Kottayam</option>
+                    <option>Idukki</option>
+                    <option>Ernakulam</option>
+                    <option>Thrissur</option>
+                    <option>Palakkad</option>
+                    <option>Malappuram</option>
+                    <option>Kozhikode</option>
+                    <option>Wayanad</option>
+                    <option>Kannur</option>
+                    <option>Kasaragod</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Type:</label>
+                <select id="filterType" onchange="performSearch()">
+                    <option value="">All Types</option>
+                    <option>Sell</option>
+                    <option>Swap</option>
+                    <option>Auction</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <div id="searchResults" class="grid"></div>
+
+    <!-- No Results -->
+    <div id="noResults" class="hidden" style="text-align: center; padding: 80px 24px;">
+        <div style="font-size: 64px; margin-bottom: 16px;">🔍</div>
+        <h2 style="font-family: 'Poppins', sans-serif; margin-bottom: 8px;">No items found</h2>
+        <p style="color: var(--color-text-light); margin-bottom: 24px;">Try adjusting your search filters or browse all items</p>
+        <a href="home.html" class="btn btn-primary">Browse All Items</a>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterSize = document.getElementById('filterSize').value;
+            const filterDistrict = document.getElementById('filterDistrict').value;
+            const filterType = document.getElementById('filterType').value;
+
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const currentUser = localStorage.getItem("currentUser");
+            const userProfile = JSON.parse(localStorage.getItem("user_" + currentUser)) || {};
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+
+            const filtered = items.filter(item => {
+                const nameMatch = item.name.toLowerCase().includes(searchTerm) || 
+                                 item.description.toLowerCase().includes(searchTerm);
+                const sizeMatch = !filterSize || item.size === filterSize;
+                const districtMatch = !filterDistrict || item.location === filterDistrict;
+                const typeMatch = !filterType || item.type === filterType;
+
+                return nameMatch && sizeMatch && districtMatch && typeMatch;
+            });
+
+            const container = document.getElementById('searchResults');
+            const noResults = document.getElementById('noResults');
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            container.innerHTML = filtered.map((item, searchIndex) => {
+                let fitBadge = '';
+                if (userProfile.size === item.size) {
+                    fitBadge = '<span class="badge badge-perfect">Perfect Fit</span>';
+                } else if (userProfile.size) {
+                    fitBadge = '<span class="badge badge-fit">Might Fit</span>';
+                }
+
+                const priceDisplay = item.type === 'Auction' 
+                    ? `Current Bid: ₹${item.highestBid}`
+                    : `Price: ₹${item.price}`;
+
+                const isSaved = saved.some(s => s.id === item.id);
+                const realIndex = items.indexOf(item);
+
+                return `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="${item.image}" alt="${item.name}">
+                            <button class="wishlist-btn ${isSaved ? 'active' : ''}" onclick="toggleSearchWishlist(event, ${realIndex})">
+                                ${isSaved ? '❤️' : '🤍'}
+                            </button>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-badges">
+                                ${fitBadge}
+                                <span class="badge badge-district">${item.location}</span>
+                            </div>
+                            <h3 class="product-name">${item.name}</h3>
+                            <div class="product-meta-row">
+                                <span class="seller-name">by ${item.seller}</span>
+                                <span class="product-meta">Size: ${item.size}</span>
+                            </div>
+                            <div class="product-price">${priceDisplay}</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary btn-small" onclick="toggleSearchSave(${realIndex})">
+                                    ${isSaved ? 'Saved' : 'Save'}
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="window.location.href='home.html'">View</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleSearchWishlist(event, index) {
+            event.stopPropagation();
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            const item = items[index];
+            
+            const isSaved = saved.some(s => s.id === item.id);
+            
+            if (isSaved) {
+                const filtered = saved.filter(s => s.id !== item.id);
+                localStorage.setItem("saved", JSON.stringify(filtered));
+            } else {
+                saved.push(item);
+                localStorage.setItem("saved", JSON.stringify(saved));
+            }
+            
+            performSearch();
+        }
+
+        function toggleSearchSave(index) {
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            const item = items[index];
+            
+            const isSaved = saved.some(s => s.id === item.id);
+            
+            if (isSaved) {
+                const filtered = saved.filter(s => s.id !== item.id);
+                localStorage.setItem("saved", JSON.stringify(filtered));
+            } else {
+                saved.push(item);
+                localStorage.setItem("saved", JSON.stringify(saved));
+            }
+            
+            performSearch();
+        }
+
+        function toggleWishlist(event, button) {
+            event.stopPropagation();
+            button.classList.toggle('active');
+            button.textContent = button.classList.contains('active') ? '❤️' : '🤍';
+        }
+
+        function addToSaved(index) {
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            saved.push(items[index]);
+            localStorage.setItem("saved", JSON.stringify(saved));
+            alert("Item saved to wishlist! ❤️");
+        }
+
+        function viewItem(index) {
+            alert("View item feature - navigate to auction or detail page");
+        }
+
+        window.onload = performSearch;
+    </script>
+</body>
+</html>

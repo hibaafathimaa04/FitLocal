@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Items - FitLocal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">FitLocal</a>
+        
+        <div class="navbar-menu">
+            <a href="home.html" class="nav-link" onclick="setActive(this)">Home</a>
+            <a href="search.html" class="nav-link" onclick="setActive(this)">Search</a>
+            <a href="upload.html" class="nav-link" onclick="setActive(this)">Upload</a>
+            <a href="saved.html" class="nav-link active" onclick="setActive(this)">Saved</a>
+            <a href="auction.html" class="nav-link" onclick="setActive(this)">Auctions</a>
+            <a href="profile.html" class="nav-link" onclick="setActive(this)">Profile</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="navbar-icon" title="Search">🔍</div>
+            <div class="navbar-icon" title="Notifications">🔔</div>
+            <div class="navbar-icon" title="Account" onclick="window.location.href='profile.html'">👤</div>
+            <button class="btn btn-primary btn-small" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="hero-section" style="padding: 40px 24px; text-align: center;">
+        <h1 style="font-family: 'Poppins', sans-serif; font-size: 32px; margin-bottom: 8px;">Your Wishlist</h1>
+        <p style="color: var(--color-text-light); margin-bottom: 0;">Items you love and want to remember</p>
+    </section>
+
+    <!-- Wishlist Grid -->
+    <div id="savedItems" class="grid"></div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden" style="text-align: center; padding: 80px 24px;">
+        <div style="font-size: 64px; margin-bottom: 16px;">💔</div>
+        <h2 style="font-family: 'Poppins', sans-serif; margin-bottom: 8px;">Your wishlist is empty</h2>
+        <p style="color: var(--color-text-light); margin-bottom: 24px;">Start adding items to your wishlist to save your favorite finds</p>
+        <a href="home.html" class="btn btn-primary">Explore Items</a>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function loadSavedItems() {
+            const container = document.getElementById('savedItems');
+            const emptyState = document.getElementById('emptyState');
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            const currentUser = localStorage.getItem("currentUser");
+            const userProfile = JSON.parse(localStorage.getItem("user_" + currentUser)) || {};
+
+            container.innerHTML = '';
+
+            if (saved.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            saved.forEach((item, index) => {
+                let fitBadge = '';
+                if (userProfile.size === item.size) {
+                    fitBadge = '<span class="badge badge-perfect">Perfect Fit</span>';
+                } else {
+                    fitBadge = '<span class="badge badge-fit">Might Fit</span>';
+                }
+
+                const priceDisplay = item.type === 'Auction' 
+                    ? `Current Bid: ₹${item.highestBid}`
+                    : `Price: ₹${item.price}`;
+
+                container.innerHTML += `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="${item.image}" alt="${item.name}">
+                            <button class="wishlist-btn active" onclick="removeSavedItem(${index})">❤️</button>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-badges">
+                                ${fitBadge}
+                                <span class="badge badge-district">${item.location}</span>
+                            </div>
+                            <h3 class="product-name">${item.name}</h3>
+                            <div class="product-meta-row">
+                                <span class="seller-name">by ${item.seller}</span>
+                                <span class="product-meta">Size: ${item.size}</span>
+                            </div>
+                            <div class="product-price">${priceDisplay}</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary" onclick="window.location.href='home.html'">View</button>
+                                <button class="btn btn-secondary" onclick="removeSavedItem(${index})">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function removeSavedItem(index) {
+            const saved = JSON.parse(localStorage.getItem("saved")) || [];
+            saved.splice(index, 1);
+            localStorage.setItem("saved", JSON.stringify(saved));
+            loadSavedItems();
+        }
+
+        window.onload = loadSavedItems;
+    </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitLocal - Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="home.html" class="navbar-logo">FitLocal</a>
+        
+        <div class="navbar-menu">
+            <a href="home.html" class="nav-link active" onclick="setActive(this)">Home</a>
+            <a href="search.html" class="nav-link" onclick="setActive(this)">Search</a>
+            <a href="upload.html" class="nav-link" onclick="setActive(this)">Upload</a>
+            <a href="saved.html" class="nav-link" onclick="setActive(this)">Saved</a>
+            <a href="auction.html" class="nav-link" onclick="setActive(this)">Auctions</a>
+            <a href="profile.html" class="nav-link" onclick="setActive(this)">Profile</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="navbar-icon" title="Search">🔍</div>
+            <div class="navbar-icon" title="Notifications">🔔</div>
+            <div class="navbar-icon" title="Account" onclick="window.location.href='profile.html'">👤</div>
+            <button class="btn btn-primary btn-small" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Discover Your Perfect Fit</h1>
+            <p>Affordable, sustainable fashion for Kerala women - Shop, Swap, and Bid on quality thrifted pieces</p>
+            <div class="hero-cta">
+                <button class="btn btn-primary" onclick="document.getElementById('filterSection').scrollIntoView({behavior: 'smooth'})">Browse Now</button>
+                <button class="btn btn-secondary" onclick="window.location.href='upload.html'">Sell Your Style</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <div id="filterSection" style="background: var(--color-white); padding: 24px; border-bottom: 1px solid var(--color-border);">
+        <div class="container">
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label>Size:</label>
+                    <select id="filterSize" onchange="loadItems()">
+                        <option value="">All Sizes</option>
+                        <option>XS</option>
+                        <option>S</option>
+                        <option>M</option>
+                        <option>L</option>
+                        <option>XL</option>
+                        <option>XXL</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>District:</label>
+                    <select id="filterLocation" onchange="loadItems()">
+                        <option value="">All Districts</option>
+                        <option>Thiruvananthapuram</option>
+                        <option>Kollam</option>
+                        <option>Pathanamthitta</option>
+                        <option>Alappuzha</option>
+                        <option>Kottayam</option>
+                        <option>Idukki</option>
+                        <option>Ernakulam</option>
+                        <option>Thrissur</option>
+                        <option>Palakkad</option>
+                        <option>Malappuram</option>
+                        <option>Kozhikode</option>
+                        <option>Wayanad</option>
+                        <option>Kannur</option>
+                        <option>Kasaragod</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Type:</label>
+                    <select id="filterType" onchange="loadItems()">
+                        <option value="">All Types</option>
+                        <option>Sell</option>
+                        <option>Swap</option>
+                        <option>Auction</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="items" class="grid"></div>
+
+    <!-- Welcome Message (Hidden, used by JS) -->
+    <div id="welcome" style="display: none;"></div>
+
+    <script src="app.js"></script>
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function toggleWishlist(cardElement, index) {
+            cardElement.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
